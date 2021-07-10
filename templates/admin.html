@@ -1,0 +1,127 @@
+{% extends "header.html" %}
+
+{% block body %}
+
+	<head>
+		<style>
+			.scrollable-menu {
+				height: auto;
+				max-height: 200px;
+				overflow-x: hidden;
+			}
+		</style>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+		<script type=text/javascript>
+			//ON LOAD
+			$(document).ready(function() {
+				$("#selected_name").text("Selecteer een gebruiker ▼");
+			});
+
+			//ADD USER
+			$(function() {
+			  $('a#add_user').bind('click', function() {
+				$.getJSON('/add_user', {
+				  username: $('input[name="add_username"]').val(),
+				  password: $('input[name="password"]').val(),
+				  ctrlPassword: $('input[name="ctrlPassword"]').val(),
+				  isAdmin: $('input[name=isAdmin]').prop('checked'),
+				}, function(data) {
+				  $("#add_result").text(data.result);
+				  if(data.hasOwnProperty('success')){
+					$('input[type=text], textarea').val("");
+					$('input[type=password], textarea').val("");
+					$('input[name=isAdmin]').prop('checked', false);
+				  };
+				  $('input[type=password], textarea').val("");
+				});
+				return false;
+			  });
+			});
+
+			//REMOVE USER
+			$(document.body).on('click', '.scrollable-menu li a', function(e) {
+				$('#selected_name').text($(this).text());
+			});
+
+			$(function() {
+				$('a#remove_user').bind('click', function() {
+					var name =  $('#selected_name').text();
+					if(name === "Selecteer een gebruiker ▼"){
+						return false;
+					} else {
+						if(confirm("Wilt u de gebruiker " + name + " echt verwijderen?")) {
+							$.getJSON('/remove_user', {
+								username: name
+							}, function(data) {
+								$("#rm_result").text(data.result);
+								if(data.hasOwnProperty('success')) {
+									document.getElementById(name).outerHTML="";
+									$('#selected_name').text("Selecteer een gebruiker ▼");
+								};
+							});
+						};
+					};
+					return false;
+				});
+			});
+		</script>
+	</head>
+
+	<body>
+	<div id=inner>
+            <br>
+            <nav class='navbar'>
+                <a href='/main'><input type='button' class='btn btn-default' value='Terug'></a>
+                <a href='/logout'><input type='button' class='btn btn-default' value='Log uit'></a>
+            </nav>
+
+			<h1>Gebruiker aanmaken</h1>
+			<p id=add_result></p>
+			<form>
+				<table>
+					<tr>
+						<td>Gebruikersnaam:</td>
+						<td><input type=text name=add_username> </td> </tr>
+					<tr>
+						<td>Wachtwoord:</td>
+						<td><input type=password name=password> </td> </tr>
+					<tr>
+						<td>Bevestig wachtwoord:</td>
+						<td><input type=password name=ctrlPassword> </td> </tr>
+					<tr>
+						<td>Admin:</td>
+						<td><input type='checkbox' name='isAdmin'></td>
+					<tr>
+						<td><a href=# id=add_user><button class='btn btn-default'>Gebruiker aanmaken</button></a> </td> </tr>
+				</table>
+			</form>
+
+			<br><br>
+			<h1>Gebruiker verwijderen</h1>
+			<p id=rm_result></p>
+			<form>
+				<table>
+					<tr>
+						<td><div class='dropdown'>
+								<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>
+									<b id=selected_name></b>
+								</button>
+								<ul class='dropdown-menu scrollable-menu' id=usernames>
+									{% for user in users %}
+										<li><a href='#' id={{ user }}>{{ user }}</a></li>
+									{% endfor %}
+								</ul>
+							</div> </td> </tr>
+					<tr>
+						<td><br></td> </tr>
+					<tr>
+						<td><a href=# id=remove_user><button class='btn btn-default'>Gebruiker verwijderen</button></a> </td> </tr>
+				</table>
+			</form>
+	</div>
+	</body>
+
+{% endblock %}

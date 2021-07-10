@@ -1,0 +1,112 @@
+{% extends 'header.html' %}
+
+{% block body %}
+
+<div id=inner>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% set NAME = username %}
+<br>
+
+
+<!-- Some useful buddons -->
+<a href='/logout'><input type='button' class='btn btn-default' value='Log uit'></a>
+{% if admin == 1 %}
+    <a href="/admin"><input type="button" class="btn btn-default" value="Admin panel"></a>
+{% endif %}
+
+    <form action="/_form_redirect" method="post" class="">
+        <!-- Loops over weeks -->
+        {% set DAYS = ['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag'] %}
+        {% for week, hours in schedule %}
+            <div><h1>Week {{ week }}</h1></div>
+                <div class="col-*-*">
+
+                    <table class="table table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <!-- Loops over dates -->
+                                <!-- Here be shitty design for the 'schedule', enjoy -->
+                                {% for i in range(5) %}
+                                    <th>{{ DAYS[i] }} : {{ hours[0][1][i][0] }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <!-- Loops over days -->
+                            {% for hour in hours %}
+                                <tr>
+                                    <td>Uur {{ hour[0] }}</td>
+                                    {% for date in hour[1] %}
+                                        <td>
+                                            <!-- date[1][x] is the username
+                                                for that particular hour and room -->
+                                            <!-- hidden fields to pass empty boxes -->
+
+                                            A10:
+                                            {% set checkBoxName = hour[0]|string + '|' + date[0] + '|a' %}
+                                            {% set disabled=1 if NAME != date[1][0] and date[1][0] != '' and admin != 1 %}
+                                            <!-- date[1][0] is current value of checkbox -->
+                                            <!-- The checkbox overwrites hidden when admin -->
+                                            <input type="checkbox"
+                                                   name={{ checkBoxName }}
+                                                   value={{ date[1][0] if date[1][0] else NAME }}
+                                                   {{ 'disabled' if disabled }}
+                                                   {{ 'checked' if date[1][0] }}>
+                                            <input type='hidden' name={{ checkBoxName }} value={{ date[1][0] if disabled }}>
+
+                                            {{ '('+date[1][0]+')' if date[1][0] }}
+                                            <br>
+
+                                            A10b:
+                                            {% set checkBoxName = hour[0]|string + '|' + date[0] + '|b' %}
+                                            {% set disabled=1 if NAME != date[1][1] and date[1][1] != '' and admin != 1 %}
+                                            <input type="checkbox"
+                                                   name={{ checkBoxName }}
+                                                   value={{ date[1][1] if date[1][1] else NAME }}
+                                                   {{ 'disabled' if disabled }}
+                                                   {{ 'checked' if date[1][1] }}>
+                                            <input type='hidden' name={{ checkBoxName }} value={{ date[1][1] if disabled }}>
+
+                                            {{ '('+date[1][1]+')' if date[1][1] }}
+                                            <br>
+
+                                            C19:
+                                            {% set checkBoxName = hour[0]|string + '|' + date[0] + '|c' %}
+                                            {% set disabled=1 if NAME != date[1][2] and date[1][2] != '' and admin != 1 %}
+                                            <input type="checkbox"
+                                                   name={{ checkBoxName }}
+                                                   value={{ date[1][2] if date[1][2] else NAME }}
+                                                   {{ 'disabled' if disabled }}
+                                                   {{ 'checked' if date[1][2] }}>
+                                            <input type='hidden' name={{ checkBoxName }} value={{ date[1][2] if disabled }}>
+
+                                            {{ '('+date[1][2]+')' if date[1][2] }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+
+                </div>
+        {% endfor %}
+
+
+
+        <input type="submit" class='btn btn-default' value="Gegevens aanpassen">
+    </form>
+<br>
+</div>
+{% endblock %}

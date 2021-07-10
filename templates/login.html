@@ -1,0 +1,54 @@
+{% extends 'header.html' %}
+
+{% block body %}
+<head>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type=text/javascript>
+        $(function() {
+            $('a#login').bind('click', function() {
+                $.getJSON('/login', {
+                    username: $('input[name="username"]').val(),
+                    password: $('input[name="password"]').val(),
+                }, function(data) {
+                    if(data.hasOwnProperty('success')) {
+                        window.location.href = '/main';
+                    } else {
+                        $('input[type=text], textarea').val("");
+                        $('input[type=password], textarea').val("");
+                        $("#result").text(data.result);
+                    };
+                });
+                return false;
+            });
+        });
+    </script>
+
+</head>
+<body>
+        <div class="text-center" id=inner>
+            <p id=result></p>
+            <form>
+                <br>
+                <div class='row'>
+                    <b>Gebuikersnaam:</b>
+                    <input type='text'
+                           name='username'>
+                </div>
+                <br>
+                <div class='row'>
+                    <b>Wachtwoord:</b>
+                    <input type='password'
+                           name='password'>
+                </div>
+                <br>
+                <div class='row'>
+                    <a href=# id=login><button class='btn btn-default'>Inloggen</button></a>
+                </div>
+            </form>
+        </div>
+    </body>
+
+{% endblock %}
